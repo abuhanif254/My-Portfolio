@@ -10,6 +10,7 @@ import {
   Loader2, 
   Plus, 
   Trash2, 
+  X,
   Edit, 
   ExternalLink, 
   ChevronRight, 
@@ -29,7 +30,7 @@ import {
 } from 'lucide-react';
 import { auth, db, logout, handleFirestoreError, OperationType } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, getDocs, limit } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, getDocs, limit, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Helmet } from 'react-helmet-async';
 import { cn } from '../lib/utils';
 
@@ -64,6 +65,15 @@ export default function Admin() {
   const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+
+  // Modal States
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Form States
+  const [postForm, setPostForm] = useState({ title: '', category: '', excerpt: '', content: '', image: '' });
+  const [projectForm, setProjectForm] = useState({ title: '', description: '', tags: '', image: '', link: '', github: '' });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -121,6 +131,41 @@ export default function Admin() {
       } catch (error) {
         handleFirestoreError(error, OperationType.DELETE, `${col}/${id}`);
       }
+    }
+  };
+
+  const handleAddPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await addDoc(collection(db, 'posts'), {
+        ...postForm,
+        createdAt: serverTimestamp(),
+      });
+      setIsPostModalOpen(false);
+      setPostForm({ title: '', category: '', excerpt: '', content: '', image: '' });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'posts');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAddProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await addDoc(collection(db, 'projects'), {
+        ...projectForm,
+        tags: projectForm.tags.split(',').map(t => t.trim()),
+        createdAt: serverTimestamp(),
+      });
+      setIsProjectModalOpen(false);
+      setProjectForm({ title: '', description: '', tags: '', image: '', link: '', github: '' });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'projects');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -306,20 +351,20 @@ export default function Admin() {
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
                       <h3 className="text-xl font-black mb-6 tracking-tight">Quick Actions</h3>
                       <div className="space-y-4">
-                        <Link to="/blog" className="flex items-center justify-between p-5 bg-white/10 rounded-2xl hover:bg-white/20 transition-all group">
+                        <button onClick={() => setIsPostModalOpen(true)} className="w-full flex items-center justify-between p-5 bg-white/10 rounded-2xl hover:bg-white/20 transition-all group text-left">
                           <div className="flex items-center gap-4">
                             <Plus className="w-5 h-5" />
                             <span className="font-bold text-sm">New Blog Post</span>
                           </div>
                           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                        <Link to="/projects" className="flex items-center justify-between p-5 bg-white/10 rounded-2xl hover:bg-white/20 transition-all group">
+                        </button>
+                        <button onClick={() => setIsProjectModalOpen(true)} className="w-full flex items-center justify-between p-5 bg-white/10 rounded-2xl hover:bg-white/20 transition-all group text-left">
                           <div className="flex items-center gap-4">
                             <Plus className="w-5 h-5" />
                             <span className="font-bold text-sm">New Project</span>
                           </div>
                           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
+                        </button>
                       </div>
                     </div>
 
@@ -408,12 +453,12 @@ export default function Admin() {
               >
                 <div className="p-10 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                   <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight uppercase">Manage {activeTab}</h3>
-                  <Link 
-                    to={activeTab === 'posts' ? '/blog' : '/projects'} 
+                  <button 
+                    onClick={() => activeTab === 'posts' ? setIsPostModalOpen(true) : setIsProjectModalOpen(true)} 
                     className="bg-brand-600 text-white px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-xl shadow-brand-600/20"
                   >
                     <Plus className="w-4 h-4" /> Add New
-                  </Link>
+                  </button>
                 </div>
                 <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {(activeTab === 'posts' ? posts : projects).map((item: any) => (
@@ -459,6 +504,202 @@ export default function Admin() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {isPostModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsPostModalOpen(false)}
+              className="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Add New Blog Post</h3>
+                <button onClick={() => setIsPostModalOpen(false)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all">
+                  <X className="w-5 h-5 text-zinc-400" />
+                </button>
+              </div>
+              <form onSubmit={handleAddPost} className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Title</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={postForm.title}
+                      onChange={e => setPostForm({...postForm, title: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="Post title..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Category</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={postForm.category}
+                      onChange={e => setPostForm({...postForm, category: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="e.g. Technology"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Image URL</label>
+                  <input 
+                    required
+                    type="url" 
+                    value={postForm.image}
+                    onChange={e => setPostForm({...postForm, image: e.target.value})}
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Excerpt</label>
+                  <textarea 
+                    required
+                    rows={2}
+                    value={postForm.excerpt}
+                    onChange={e => setPostForm({...postForm, excerpt: e.target.value})}
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                    placeholder="Short summary of the post..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Content (Markdown)</label>
+                  <textarea 
+                    required
+                    rows={6}
+                    value={postForm.content}
+                    onChange={e => setPostForm({...postForm, content: e.target.value})}
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                    placeholder="Write your post content here..."
+                  />
+                </div>
+                <button 
+                  disabled={isSubmitting}
+                  type="submit" 
+                  className="w-full bg-brand-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-brand-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Publish Post'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {isProjectModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsProjectModalOpen(false)}
+              className="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Add New Project</h3>
+                <button onClick={() => setIsProjectModalOpen(false)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all">
+                  <X className="w-5 h-5 text-zinc-400" />
+                </button>
+              </div>
+              <form onSubmit={handleAddProject} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Title</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={projectForm.title}
+                      onChange={e => setProjectForm({...projectForm, title: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="Project title..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Tags (comma separated)</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={projectForm.tags}
+                      onChange={e => setProjectForm({...projectForm, tags: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="React, Node.js, Tailwind"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Description</label>
+                  <textarea 
+                    required
+                    rows={3}
+                    value={projectForm.description}
+                    onChange={e => setProjectForm({...projectForm, description: e.target.value})}
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                    placeholder="Brief project description..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Image URL</label>
+                  <input 
+                    required
+                    type="url" 
+                    value={projectForm.image}
+                    onChange={e => setProjectForm({...projectForm, image: e.target.value})}
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Live Link</label>
+                    <input 
+                      type="url" 
+                      value={projectForm.link}
+                      onChange={e => setProjectForm({...projectForm, link: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">GitHub Link</label>
+                    <input 
+                      type="url" 
+                      value={projectForm.github}
+                      onChange={e => setProjectForm({...projectForm, github: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="https://github.com/..."
+                    />
+                  </div>
+                </div>
+                <button 
+                  disabled={isSubmitting}
+                  type="submit" 
+                  className="w-full bg-brand-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-brand-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Add Project'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
