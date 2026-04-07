@@ -1,4 +1,5 @@
+
 User-agent: *
 Allow: /
 
-Sitemap: https://ais-dev-2rerkcyxshimlhkjo4brkz-367387700519.asia-southeast1.run.app/sitemap.xml
+Sitemap: https://vercel.app
