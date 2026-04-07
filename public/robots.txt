@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vercel.app
+Sitemap: https://abu-hanif-mia.vercel.app
