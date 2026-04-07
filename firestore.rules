@@ -1,0 +1,192 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: projects
+    // Fields:
+    //   - title: string (required)
+    //   - description: string (required)
+    //   - tags: list (required)
+    //   - link: string (optional)
+    //   - github: string (optional)
+    //   - image: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: skills
+    // Fields:
+    //   - name: string (required)
+    //   - level: number (required, 0-100)
+    //   - category: string (optional)
+    //   - order: number (optional)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string
+    //   - role: string ('admin' or 'user')
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.email.lower() == "mohammadbitullah@gmail.com" ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['title', 'description', 'tags', 'image', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.description is string && data.description.size() < 500 &&
+             (!('challenge' in data) || data.challenge is string) &&
+             (!('solution' in data) || data.solution is string) &&
+             (!('hurdles' in data) || data.hurdles is string) &&
+             (!('gallery' in data) || data.gallery is list) &&
+             data.tags is list &&
+             data.image is string &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidSkill(data) {
+      return data.keys().hasAll(['name', 'level']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 50 &&
+             data.level is number && data.level >= 0 && data.level <= 100;
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['name', 'email', 'message', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.message is string && data.message.size() > 0 && data.message.size() < 2000 &&
+             data.createdAt == request.time;
+    }
+
+    function isValidPost(data) {
+      return data.keys().hasAll(['title', 'excerpt', 'content', 'category', 'image', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.excerpt is string && data.excerpt.size() < 500 &&
+             data.content is string && data.content.size() < 50000 &&
+             data.category is string &&
+             data.image is string &&
+             data.createdAt == request.time;
+    }
+
+    function isValidService(data) {
+      return data.keys().hasAll(['title', 'description', 'iconName']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.description is string && data.description.size() < 500 &&
+             data.iconName is string &&
+             (!('order' in data) || data.order is number);
+    }
+
+    function isValidExperience(data) {
+      return data.keys().hasAll(['company', 'role', 'period', 'description']) &&
+             data.company is string && data.company.size() > 0 &&
+             data.role is string && data.role.size() > 0 &&
+             data.period is string && data.period.size() > 0 &&
+             data.description is string && data.description.size() < 1000 &&
+             (!('order' in data) || data.order is number);
+    }
+
+    function isValidEducation(data) {
+      return data.keys().hasAll(['institution', 'degree', 'year', 'description']) &&
+             data.institution is string && data.institution.size() > 0 &&
+             data.degree is string && data.degree.size() > 0 &&
+             data.year is string && data.year.size() > 0 &&
+             data.description is string && data.description.size() < 500 &&
+             (!('order' in data) || data.order is number);
+    }
+
+    function isValidTestimonial(data) {
+      return data.keys().hasAll(['name', 'role', 'content', 'avatar']) &&
+             data.name is string && data.name.size() > 0 &&
+             data.role is string && data.role.size() > 0 &&
+             data.content is string && data.content.size() < 1000 &&
+             data.avatar is string &&
+             (!('order' in data) || data.order is number);
+    }
+
+    function isValidFAQ(data) {
+      return data.keys().hasAll(['question', 'answer']) &&
+             data.question is string && data.question.size() > 0 &&
+             data.answer is string && data.answer.size() > 0 &&
+             (!('order' in data) || data.order is number);
+    }
+
+    function isValidSubscriber(data) {
+      return data.keys().hasAll(['email', 'createdAt']) &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.email.size() < 100 &&
+             data.createdAt == request.time;
+    }
+
+    // Rules
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidProject(request.resource.data);
+    }
+
+    match /skills/{skillId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidSkill(request.resource.data);
+    }
+
+    match /messages/{messageId} {
+      allow create: if isValidMessage(request.resource.data);
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidPost(request.resource.data);
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidService(request.resource.data);
+    }
+
+    match /experience/{expId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidExperience(request.resource.data);
+    }
+
+    match /education/{eduId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /testimonials/{testId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidTestimonial(request.resource.data);
+    }
+
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidFAQ(request.resource.data);
+    }
+
+    match /subscribers/{subId} {
+      allow create: if isValidSubscriber(request.resource.data);
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+  }
+}

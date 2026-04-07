@@ -1,0 +1,179 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A portfolio project item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The name of the project" },
+        "description": { "type": "string", "description": "Short summary of the project" },
+        "challenge": { "type": "string", "description": "The challenge addressed by the project" },
+        "solution": { "type": "string", "description": "The solution implemented" },
+        "hurdles": { "type": "string", "description": "Technical hurdles overcome" },
+        "keyFeatures": { "type": "array", "items": { "type": "string" }, "description": "List of key features" },
+        "lessonsLearned": { "type": "string", "description": "Lessons learned during the project" },
+        "gallery": { "type": "array", "items": { "type": "string" }, "description": "Gallery of screenshot URLs" },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Technologies used" },
+        "link": { "type": "string", "description": "Live demo URL" },
+        "github": { "type": "string", "description": "Source code URL" },
+        "image": { "type": "string", "description": "Cover image URL" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "tags", "image"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "A technical expertise item",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the skill" },
+        "level": { "type": "integer", "description": "Proficiency level (0-100)" },
+        "category": { "type": "string", "description": "Skill category (e.g., Frontend, Backend)" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["name", "level"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A contact form message",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Sender's full name" },
+        "email": { "type": "string", "format": "email", "description": "Sender's email address" },
+        "message": { "type": "string", "description": "Message content" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message"]
+    },
+    "BlogPost": {
+      "title": "Blog Post",
+      "description": "A blog post item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the post" },
+        "excerpt": { "type": "string", "description": "A short summary of the post" },
+        "content": { "type": "string", "description": "The full content of the post in Markdown" },
+        "category": { "type": "string", "description": "The category of the post" },
+        "image": { "type": "string", "description": "Cover image URL" },
+        "author": { "type": "string", "description": "The author's name" },
+        "published": { "type": "boolean", "description": "Whether the post is published" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "excerpt", "content", "category", "image", "createdAt"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A service offered",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the service" },
+        "description": { "type": "string", "description": "Detailed description of the service" },
+        "iconName": { "type": "string", "description": "Lucide icon name" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["title", "description", "iconName"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "A professional experience item",
+      "type": "object",
+      "properties": {
+        "company": { "type": "string", "description": "The company name" },
+        "role": { "type": "string", "description": "The job role" },
+        "period": { "type": "string", "description": "The time period (e.g., 2023 - Present)" },
+        "description": { "type": "string", "description": "Detailed description of responsibilities" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["company", "role", "period", "description"]
+    },
+    "Education": {
+      "title": "Education",
+      "description": "An academic background item",
+      "type": "object",
+      "properties": {
+        "institution": { "type": "string", "description": "The institution name" },
+        "degree": { "type": "string", "description": "The degree earned" },
+        "year": { "type": "string", "description": "The graduation year or period" },
+        "description": { "type": "string", "description": "Brief summary of studies" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["institution", "degree", "year", "description"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "A client testimonial",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The client's name" },
+        "role": { "type": "string", "description": "The client's role" },
+        "content": { "type": "string", "description": "The testimonial content" },
+        "avatar": { "type": "string", "description": "Client's avatar URL" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["name", "role", "content", "avatar"]
+    },
+    "FAQ": {
+      "title": "FAQ",
+      "description": "A frequently asked question",
+      "type": "object",
+      "properties": {
+        "question": { "type": "string", "description": "The question text" },
+        "answer": { "type": "string", "description": "The answer text" },
+        "order": { "type": "integer", "description": "Display order" }
+      },
+      "required": ["question", "answer"]
+    },
+    "Subscriber": {
+      "title": "Subscriber",
+      "description": "A newsletter subscriber",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "description": "Subscriber's email address" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/projects": {
+      "schema": "Project",
+      "description": "Collection of portfolio projects"
+    },
+    "/skills": {
+      "schema": "Skill",
+      "description": "Collection of technical skills"
+    },
+    "/messages": {
+      "schema": "Message",
+      "description": "Collection of contact form messages"
+    },
+    "/posts": {
+      "schema": "BlogPost",
+      "description": "Collection of blog posts"
+    },
+    "/services": {
+      "schema": "Service",
+      "description": "Collection of services"
+    },
+    "/experience": {
+      "schema": "Experience",
+      "description": "Collection of professional experience"
+    },
+    "/education": {
+      "schema": "Education",
+      "description": "Collection of academic background"
+    },
+    "/testimonials": {
+      "schema": "Testimonial",
+      "description": "Collection of testimonials"
+    },
+    "/faqs": {
+      "schema": "FAQ",
+      "description": "Collection of FAQs"
+    },
+    "/subscribers": {
+      "schema": "Subscriber",
+      "description": "Collection of newsletter subscribers"
+    }
+  }
+}
