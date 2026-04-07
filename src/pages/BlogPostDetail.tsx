@@ -139,7 +139,7 @@ export default function BlogPostDetail() {
             "image": post.image,
             "author": {
               "@type": "Person",
-              "name": post.author
+              "name": post.author || 'Hanif Mia'
             },
             "datePublished": post.createdAt?.toDate().toISOString(),
             "publisher": {
@@ -191,7 +191,7 @@ export default function BlogPostDetail() {
                     </span>
                     <span className="flex items-center gap-2">
                       <User className="w-4 h-4 text-brand-600" />
-                      {post.author}
+                      {post.author || 'Hanif Mia'}
                     </span>
                     <span className="flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-brand-600" />
@@ -226,7 +226,7 @@ export default function BlogPostDetail() {
                         },
                       }}
                     >
-                      {post.content}
+                      {post.content || 'No content available for this post.'}
                     </Markdown>
                   </div>
 
@@ -289,7 +289,7 @@ export default function BlogPostDetail() {
                   className="w-full h-full"
                 />
               </div>
-              <h3 className="text-xl font-extrabold text-zinc-900 dark:text-white mb-3 tracking-tight">{post.author}</h3>
+              <h3 className="text-xl font-extrabold text-zinc-900 dark:text-white mb-3 tracking-tight">{post.author || 'Hanif Mia'}</h3>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed font-medium">
                 Full-stack developer and tech enthusiast sharing insights on modern web development.
               </p>

@@ -140,7 +140,7 @@ export default function Blog() {
                         </span>
                         <span className="flex items-center gap-2">
                           <User className="w-4 h-4 text-brand-600" />
-                          {post.author}
+                          {post.author || 'Hanif Mia'}
                         </span>
                         <span className="flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-brand-600" />
@@ -151,7 +151,7 @@ export default function Blog() {
                         {post.title}
                       </h2>
                       <p className="text-zinc-500 dark:text-zinc-400 mb-10 line-clamp-3 leading-relaxed text-sm font-medium">
-                        {post.excerpt}
+                        {post.excerpt || (post.content ? post.content.substring(0, 150) + '...' : 'No description available.')}
                       </p>
                       <Link 
                         to={`/blog/${post.id}`}

@@ -11,6 +11,8 @@ import {
   Plus, 
   Trash2, 
   X,
+  CheckCircle2,
+  AlertCircle,
   Edit, 
   ExternalLink, 
   ChevronRight, 
@@ -24,9 +26,7 @@ import {
   TrendingUp,
   Settings,
   Bell,
-  Search,
-  CheckCircle2,
-  AlertCircle
+  Search
 } from 'lucide-react';
 import { auth, db, logout, handleFirestoreError, OperationType } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -70,10 +70,26 @@ export default function Admin() {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Form States
-  const [postForm, setPostForm] = useState({ title: '', category: '', excerpt: '', content: '', image: '' });
-  const [projectForm, setProjectForm] = useState({ title: '', description: '', tags: '', image: '', link: '', github: '' });
+  const [postForm, setPostForm] = useState({ title: '', category: '', excerpt: '', content: '', image: '', author: 'Hanif Mia' });
+  const [projectForm, setProjectForm] = useState({ 
+    title: '', 
+    description: '', 
+    tags: '', 
+    image: '', 
+    link: '', 
+    github: '',
+    challenge: '',
+    solution: '',
+    hurdles: ''
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -143,9 +159,11 @@ export default function Admin() {
         createdAt: serverTimestamp(),
       });
       setIsPostModalOpen(false);
-      setPostForm({ title: '', category: '', excerpt: '', content: '', image: '' });
+      setPostForm({ title: '', category: '', excerpt: '', content: '', image: '', author: 'Hanif Mia' });
+      showToast('Blog post published successfully!');
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'posts');
+      showToast('Failed to publish post.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -161,9 +179,21 @@ export default function Admin() {
         createdAt: serverTimestamp(),
       });
       setIsProjectModalOpen(false);
-      setProjectForm({ title: '', description: '', tags: '', image: '', link: '', github: '' });
+      setProjectForm({ 
+        title: '', 
+        description: '', 
+        tags: '', 
+        image: '', 
+        link: '', 
+        github: '',
+        challenge: '',
+        solution: '',
+        hurdles: ''
+      });
+      showToast('Project added successfully!');
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'projects');
+      showToast('Failed to add project.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -553,16 +583,29 @@ export default function Admin() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Image URL</label>
-                  <input 
-                    required
-                    type="url" 
-                    value={postForm.image}
-                    onChange={e => setPostForm({...postForm, image: e.target.value})}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
-                    placeholder="https://..."
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Author</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={postForm.author}
+                      onChange={e => setPostForm({...postForm, author: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="Hanif Mia"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Image URL</label>
+                    <input 
+                      required
+                      type="url" 
+                      value={postForm.image}
+                      onChange={e => setPostForm({...postForm, image: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all"
+                      placeholder="https://..."
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Excerpt</label>
@@ -688,6 +731,38 @@ export default function Admin() {
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">The Challenge</label>
+                    <textarea 
+                      rows={3}
+                      value={projectForm.challenge}
+                      onChange={e => setProjectForm({...projectForm, challenge: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                      placeholder="What was the problem?"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">The Solution</label>
+                    <textarea 
+                      rows={3}
+                      value={projectForm.solution}
+                      onChange={e => setProjectForm({...projectForm, solution: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                      placeholder="How did you solve it?"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Technical Hurdles</label>
+                    <textarea 
+                      rows={3}
+                      value={projectForm.hurdles}
+                      onChange={e => setProjectForm({...projectForm, hurdles: e.target.value})}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-600 transition-all resize-none"
+                      placeholder="Any specific difficulties?"
+                    />
+                  </div>
+                </div>
                 <button 
                   disabled={isSubmitting}
                   type="submit" 
@@ -698,6 +773,26 @@ export default function Admin() {
               </form>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            className={cn(
+              "fixed bottom-10 left-1/2 z-[110] px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border",
+              toast.type === 'success' 
+                ? "bg-emerald-500 text-white border-emerald-400" 
+                : "bg-red-500 text-white border-red-400"
+            )}
+          >
+            {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+            <span className="font-bold text-sm tracking-tight">{toast.message}</span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
