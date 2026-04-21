@@ -23,10 +23,10 @@ import OptimizedImage from '../components/OptimizedImage';
 
 export default function About() {
   const stats = [
-    { label: 'Years Experience', value: '3+', icon: <History className="w-5 h-5" /> },
-    { label: 'Projects Completed', value: '50+', icon: <Target className="w-5 h-5" /> },
-    { label: 'Happy Clients', value: '30+', icon: <Heart className="w-5 h-5" /> },
-    { label: 'Cups of Coffee', value: '1.2k', icon: <Coffee className="w-5 h-5" /> },
+    { label: 'Years Experience', value: '1+', icon: <History className="w-5 h-5" /> },
+    { label: 'Projects Completed', value: '15+', icon: <Target className="w-5 h-5" /> },
+    { label: 'Happy Clients', value: '10+', icon: <Heart className="w-5 h-5" /> },
+    { label: 'Cups of Coffee', value: '100+', icon: <Coffee className="w-5 h-5" /> },
   ];
 
   const values = [
