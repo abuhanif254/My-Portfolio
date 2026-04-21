@@ -52,7 +52,7 @@ export default function About() {
       <Helmet>
         <title>About Me | MD Abu Hanif Mia - MERN Stack Developer</title>
         <meta name="description" content="Learn more about MD Abu Hanif Mia, his journey as a MERN Stack Developer, his philosophy, and his passion for building digital products." />
-        <meta name="keywords" content="MD Abu Hanif Mia, About Me, MERN Stack Developer, Web Developer Journey, Software Engineer Biography" />
+        <meta name="keywords" content="MD Abu Hanif Mia, Abu Hanif, Hanif mia, baitullah, Mohammad Bitullah, About Me, MERN Stack Developer, Web Developer Journey, Software Engineer Biography" />
         <link rel="canonical" href={window.location.href} />
       </Helmet>
 
@@ -100,7 +100,7 @@ export default function About() {
             >
               <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-zinc-900/20 dark:shadow-none border border-white/20 dark:border-zinc-800">
                 <OptimizedImage 
-                  src="https://scontent.fdac152-1.fna.fbcdn.net/v/t39.30808-6/486701241_2718294485025413_5530357904734433234_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=53a332&_nc_ohc=a5HlLe44kVMQ7kNvwExfLEX&_nc_oc=AdqzaIaucuSRN-k8GZZh0hXsRzh6DjJuvjhSRCEjBrilD_1we0r0noqBwwJtx_HfKXI&_nc_zt=23&_nc_ht=scontent.fdac152-1.fna&_nc_gid=85Il-Yk2Rmk_JFST7EgIEw&_nc_ss=7a3a8&oh=00_Af0ymlgtrEjpcNmmUFRY2LXtELwgJVBqD5F0RR0vb8s32A&oe=69D9CADA" 
+                  src="https://ik.imagekit.io/ubwpdqyav/458475699_2542066009314929_8423072987881722825_n__1_-removebg-preview.png" 
                   alt="Hanif Mia Working" 
                   className="w-full h-full"
                   priority
@@ -215,7 +215,7 @@ export default function About() {
             >
               <div className="aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl">
                 <OptimizedImage 
-                  src="https://scontent.fdac152-1.fna.fbcdn.net/v/t39.30808-6/581748999_2947082842146575_2858509103678255413_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7b2446&_nc_ohc=nidliFoMgW4Q7kNvwGKDOmM&_nc_oc=AdoTq4_O0RlzrdqIZxXoLJdc0RjyvfLgFzSs0_pAyOUclr93-QvJfbg9u1GIjHz8Ml8&_nc_zt=23&_nc_ht=scontent.fdac152-1.fna&_nc_gid=noxujKhjkHY5pXV-ZQZjcg&_nc_ss=7a3a8&oh=00_Af11REE4Sw-Gp7XOT5OsImIqT61VtmY8yY9F1nIbHWRnXg&oe=69D9DF64" 
+                  src="https://ik.imagekit.io/ubwpdqyav/581748999_2947082842146575_2858509103678255413_n.jpg?updatedAt=1776775289778" 
                   alt="Hobbies" 
                   className="w-full h-full"
                 />
