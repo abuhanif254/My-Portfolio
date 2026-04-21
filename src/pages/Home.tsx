@@ -270,7 +270,7 @@ export default function Home() {
                 className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl shadow-zinc-900/20 dark:shadow-none border border-white/20 dark:border-zinc-800"
               >
                 <OptimizedImage 
-                  src="https://scontent.fdac152-1.fna.fbcdn.net/v/t39.30808-1/650403916_3064913927030132_7107040383800220641_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=103&ccb=1-7&_nc_sid=1d2534&_nc_ohc=y08md-hVDVsQ7kNvwGw125Y&_nc_oc=AdpDYyQsSHHqu8qxjdAhBIdF5IJKz57w_fJlTtVhnnFcj6KNHyt8-fdt3MtjzLJPy6g&_nc_zt=24&_nc_ht=scontent.fdac152-1.fna&_nc_gid=g_PwChbE8NOueyl8FXBlCg&_nc_ss=7a3a8&oh=00_Af3XowpNUUnXYXUaW2pdwTxNNo56qNjfqlZt0aVaIZaR_A&oe=69D931E8" 
+                  src="https://ik.imagekit.io/ubwpdqyav/my_photo-removebg-preview.png" 
                   alt="Hanif Mia" 
                   className="w-full h-full"
                   priority
